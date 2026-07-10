@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Connects to the server using a specific identity file and username
+ssh -i ~/.ssh/school ubuntu@$1
