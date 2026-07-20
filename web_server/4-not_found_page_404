@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-# Configures Nginx with a custom 404 page returning the specified text string
+# Configures Nginx with a custom 404 page returning the required text string
 
 apt-get update -y
 apt-get install nginx -y
 
 echo "Holberton School for the win!" > /var/www/html/index.nginx-debian.html
 
-# Create the custom 404 page
+# Create the custom 404 file containing the exact required string
 echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
 
 CONFIG_FILE="/etc/nginx/sites-available/default"
 
-# Inject the error_page definition and map it to return the custom 404 file properly
-sed -i "/server_name _;/a \\\t/custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /var/www/html;\n\t\tinternal;\n\t}" "$CONFIG_FILE"
-sed -i "/server_name _;/a \\\terror_page 404" "$CONFIG_FILE"
+# Clean up any existing custom 404 configuration attempts to prevent duplicate errors
+sed -i '/custom_404/d' "$CONFIG_FILE"
+sed -i '/error_page 404/d' "$CONFIG_FILE"
+
+# Inject the error_page directive and its location block accurately into the server block
+sed -i '/server_name _;/a \	error_page 404 /custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /var/www/html;\n\t\tinternal;\n\t}' "$CONFIG_FILE"
 
 service nginx restart
