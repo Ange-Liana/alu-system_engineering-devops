@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Configures a new Ubuntu machine with Nginx and a custom X-Served-By response header
+# shellcheck disable=SC2154
+
+apt-get update -y
+apt-get install nginx -y
+
+echo "Holberton School for the win!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+
+CONFIG_FILE="/etc/nginx/sites-available/default"
+
+# Inject custom header and 404 rules inside the default server block configuration setup
+sed -i '/server_name _;/a \	add_header X-Served-By $hostname;\n\terror_page 404 /custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /var/www/html;\n\t\tinternal;\n\t}' "$CONFIG_FILE"
+
+service nginx restart

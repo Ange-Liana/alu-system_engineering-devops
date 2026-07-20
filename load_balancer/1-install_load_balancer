@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Installs and configures HAProxy on a new machine to balance traffic between two web servers
+
+apt-get update -y
+apt-get install haproxy -y
+
+# Enable HAProxy init script configuration setups
+echo "ENABLED=1" > /etc/default/haproxy
+
+# Build new custom balanced configuration matching the server targets exactly
+cat << EOF > /etc/haproxy/haproxy.cfg
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    retries 3
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+frontend local_http_frontend
+    bind *:80
+    mode http
+    default_backend web_server_backend
+
+backend web_server_backend
+    mode http
+    balance roundrobin
+    server 7147-web-01 54.227.137.95:80 check
+    server 7147-web-02 13.221.90.222:80 check
+EOF
+
+service haproxy restart
