@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-# Connects to the specific web server using the school private key
-ssh -i ~/.ssh/school ubuntu@54.227.137.95
+# Connects to the server using the private key ~/.ssh/school
+
+ssh -i ~/.ssh/school ubuntu@"$1"
