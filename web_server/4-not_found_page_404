@@ -1,29 +1,18 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx with a custom 404 page and a 301 redirect
+# Configures Nginx with a custom 404 page returning the specified text string
 
 apt-get update -y
-apt-get install -y nginx
+apt-get install nginx -y
 
-echo "Holberton School for the win!" > /var/www/html/index.html
+echo "Holberton School for the win!" > /var/www/html/index.nginx-debian.html
 
-echo "Ceci n'est pas une page" > /var/www/html/404.html
+# Create the custom 404 page
+echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
 
-awk '
-/server_name _;/ {
-    print;
-    print "    location /redirect_me {";
-    print "        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;";
-    print "    }";
-    print "";
-    print "    error_page 404 /404.html;";
-    print "    location = /404.html {";
-    print "        internal;";
-    print "    }";
-    next
-}
-{ print }
-' /etc/nginx/sites-available/default > /tmp/default
+CONFIG_FILE="/etc/nginx/sites-available/default"
 
-mv /tmp/default /etc/nginx/sites-available/default
+# Inject the error_page definition and map it to return the custom 404 file properly
+sed -i "/server_name _;/a \\\t/custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /var/www/html;\n\t\tinternal;\n\t}" "$CONFIG_FILE"
+sed -i "/server_name _;/a \\\terror_page 404" "$CONFIG_FILE"
 
 service nginx restart
