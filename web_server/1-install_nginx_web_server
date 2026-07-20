@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx to serve a page containing "Holberton School"
+# Installs and configures Nginx to serve "Holberton School for the win!"
 
 apt-get update -y
 apt-get install -y nginx
