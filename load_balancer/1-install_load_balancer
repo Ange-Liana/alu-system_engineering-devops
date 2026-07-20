@@ -35,8 +35,8 @@ frontend local_http_frontend
 backend web_server_backend
     mode http
     balance roundrobin
-    server 7147-web-01 54.227.137.95:80 check
-    server 7147-web-02 13.221.90.222:80 check
+    server web-01 54.227.137.95:80 check
+    server web-02 13.221.90.222:80 check
 EOF
 
 service haproxy restart
