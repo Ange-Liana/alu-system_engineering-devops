@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-# Starts the Apache service inside a running Docker container
+# Starts the Apache service inside the running Docker container and checks status
 
 docker exec -i "$(docker ps -q)" service apache2 start
+docker exec -i "$(docker ps -q)" service apache2 status
