@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
-# Starts the Apache service inside the running Docker container and checks status
-
-docker exec -i "$(docker ps -q)" service apache2 start
-docker exec -i "$(docker ps -q)" service apache2 status
+# Starts Apache web server
+service apache2 start
