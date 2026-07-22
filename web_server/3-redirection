@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx with a 301 redirect
+# Configures Nginx with a 301 redirection for /redirect_me
 
 apt-get update -y
 apt-get install -y nginx
 
-echo "Holberton School for the win!" > /var/www/html/index.html
+echo "Holberton School" > /var/www/html/index.html
 
-awk '
-/server_name _;/ {
-    print;
-    print "    location /redirect_me {";
-    print "        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;";
-    print "    }";
-    next
-}
-{ print }
-' /etc/nginx/sites-available/default > /tmp/default
-
-mv /tmp/default /etc/nginx/sites-available/default
+# Insert redirect rule right after server_name line in default config
+sed -i '/server_name _;/a \    location /redirect_me {\n        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n    }' /etc/nginx/sites-available/default
 
 service nginx restart
