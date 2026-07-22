@@ -1,42 +1,32 @@
 #!/usr/bin/env bash
-# Installs and configures HAProxy on a new machine to balance traffic between two web servers
+# Install and configure HAProxy as a round-robin load balancer
 
-apt-get update -y
-apt-get install haproxy -y
+apt-get update
+apt-get install -y haproxy
 
-# Enable HAProxy init script configuration setups
-echo "ENABLED=1" > /etc/default/haproxy
-
-# Build new custom balanced configuration matching the server targets exactly
-cat << EOF > /etc/haproxy/haproxy.cfg
+cat > /etc/haproxy/haproxy.cfg <<EOF
 global
-    log /dev/log local0
-    log /dev/log local1 notice
-    chroot /var/lib/haproxy
-    user haproxy
-    group haproxy
-    daemon
+        log /dev/log local0
+        log /dev/log local1 notice
+        daemon
 
 defaults
-    log     global
-    mode    http
-    option  httplog
-    option  dontlognull
-    retries 3
-    timeout connect 5000
-    timeout client  50000
-    timeout server  50000
+        log global
+        mode http
+        option httplog
+        option dontlognull
+        timeout connect 5000
+        timeout client 50000
+        timeout server 50000
 
-frontend local_http_frontend
-    bind *:80
-    mode http
-    default_backend web_server_backend
+frontend web_front
+        bind *:80
+        default_backend web_servers
 
-backend web_server_backend
-    mode http
-    balance roundrobin
-    server web-01 54.227.137.95:80 check
-    server web-02 13.221.90.222:80 check
+backend web_servers
+        balance roundrobin
+        server web01 54.227.137.95:80 check
+        server web02 13.221.90.222:80 check
 EOF
 
 service haproxy restart
